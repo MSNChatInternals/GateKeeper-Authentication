@@ -59,8 +59,20 @@ re_MSNREGCOOKIE = re.compile ('NAME="MSNREGCookie".*?VALUE="(.*?)"')
 
 
 
+def find_cookies (headers, cookies):
+
+  for s in search_list (headers, re_set_cookie, 1):
+    for x in s.split (';'):
+      m = x.split ('=')
+      if len (m) == 2:
+        key = m[0].strip ()
+        if key in ['MSPAuth', 'MSPProf', 'ChatURL', 'MSNChatNN']:
+  	  cookies[m[0].strip ()]= m[1]
+
 def handle_302 (url, cookies, depth = ''):
+   #print "====================================================================="
    print depth + url[0:50] + '...'
+   #print cookies
    opener=urllib.URLopener()
    opener.addheader("User-Agent", r"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.0.3705)")
    cookie = ''
@@ -72,16 +84,16 @@ def handle_302 (url, cookies, depth = ''):
      MSNREGCOOKIE = search_list (data, re_MSNREGCOOKIE)
      if MSNREGCOOKIE:
        # well done, thou faithful servant
+       print "Found MSNREGCOOKIE!"
        return MSNREGCOOKIE
      url = 'http://chat.msn.be/' + search_list (data, re_src)
      return handle_302 (url, cookies, depth + '  ')
    except IOError, arg:
-     for s in search_list (arg[3].headers, re_set_cookie, 1):
-       for x in s.split (';'):
-         m = x.split ('=')
-	 if len (m) == 2:
-	   cookies[m[0]]= m[1]
-     url = search_list (arg[3].headers, re_location)
+     #print arg
+     #print arg[3].headers
+     new_url = search_list (arg[3].headers, re_location)
+     url = new_url
+     find_cookies (arg[3].headers, cookies)
      return handle_302 (url, cookies, depth + '  ')
 
 #
@@ -116,8 +128,13 @@ def do_https (host, post, body, try_to_find_MSNREGCOOKIE):
    status, reason, header= hs.getreply()
    data=hs.getfile().read()
    
-   MSPAuth = search_list (hs.headers.headers, re_cookie_auth)
-   MSPProf = search_list (hs.headers.headers, re_cookie_prof)
+   # avoid being redirected to the download page of the chat client
+   cookies = {'hasOCX':'2%2C03%2C0204%2C0801'}
+
+   find_cookies (hs.headers.headers, cookies)
+   MSPAuth = cookies['MSPAuth']
+   MSPProf = cookies['MSPProf']
+   
    t = search_list (data, re_t)
    p = search_list (data, re_p)
    url = search_list (data, re_url)
@@ -130,8 +147,8 @@ def do_https (host, post, body, try_to_find_MSNREGCOOKIE):
    #  at this point, we have the auth and profile cookie.
    #
    if try_to_find_MSNREGCOOKIE:
-     print "trying to retrieve MSNREGCOOKIE (may timeout)"
-     MSNREGCOOKIE = handle_302 (url, {'MSPAuth':MSPAuth, 'MSPProf':MSPProf, 'hasOCX':'2%2C03%2C0204%2C0801'})
+     print "trying to retrieve MSNREGCOOKIE (may timeout, crash, go in infinite 302 loop, ...)"
+     MSNREGCOOKIE = handle_302 (url, cookies)
    else:
      MSNREGCOOKIE = None
 
@@ -150,7 +167,8 @@ def passport_login (login, domain, password, try_to_find_MSNREGCOOKIE):
   opener=urllib.FancyURLopener()
   opener.addheader("User-Agent", r"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.0.3705)")
   lines = opener.open(r"http://chat.msn.be").readlines ()
-  re_some_chatroom = re.compile (r'<a href="(http://chat.msn.be/chatroom.msnw\?rhx=.*?;rhx1=.*?)"') 
+  #re_some_chatroom = re.compile (r'<a href="(http://chat.msn.be/chatroom.msnw\?rhx=.*?;rhx1=.*?)"') 
+  re_some_chatroom = re.compile (r'<a href="(http://chat.msn.be/chatroom.msnw\?rm=.*?)"') 
   chatroom_url = search_list (lines, re_some_chatroom)
   if chatroom_url:
     print "Opening url to some chatroom : ",chatroom_url[:40]+'...'
@@ -182,6 +200,36 @@ if __name__ == '__main__':
 
 
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
