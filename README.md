@@ -28,7 +28,7 @@ GateKeeper version 3 included the server hostname in the hash, making the previo
 - **Ports of zmic's code**: Various ports of the code provided by zmic, including the updated hash calculation with the chat server's hostname.
 - **Hooking wsock32.dll calls**: It was possible to hook various wsock32.dll calls to force connection to localhost or intercept the socket communication directly. This was demonstrated by JD long after the MSN Chat Service was closed.
 
-By the time the MSN Chat Service closed, the most common method was to use ports of zmic's code with the updated algorithm. Many years later, JD noticed that the two keys provided by zmic's code were actually both 64-byte copies of the string "SRFMKSJANDRESKKC" XOR'd by 0x5c and 0x36, respectively. JD and Sky then realized that the authentication was based on a simple HMAC-MD5.
+By the time the MSN Chat Service closed, the most common method was to use a port of zmic's code with the updated algorithm. Many years later, JD noticed that the two keys provided by zmic's code were actually both 64-byte copies of the string "SRFMKSJANDRESKKC" XOR'd by 0x5c and 0x36, respectively. JD and Sky then realized that the authentication was based on a simple HMAC-MD5.
 
 # GateKeeper Protocol Details
 
