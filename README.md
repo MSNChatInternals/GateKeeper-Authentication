@@ -11,7 +11,7 @@ In this extension, the GUID that is sent in versions 2 and 3 would be set to `{0
 The server would verify the account was a valid Microsoft Account or MSA (previously known as Microsoft Passport, .NET Passport, and Windows Live ID) and set the user's address to an internal account identifier, rather than using the GUID as was done for regular GateKeeper users.
 
 ## Discovery Process
-[MSN Chat Protocol](MSN%20Chat%20Protocol.md) forum thread begins with a user wanting to connect to MSN Chat from a Linux environment. Another user, named zmic, started reverse engineering the MSN Chat Control to understand its workings. Through several attempts, zmic managed to authenticate successfully sometimes and eventually refined the method to work consistently.
+The [MSN Chat Protocol](MSN%20Chat%20Protocol.md) forum thread begins with a user wanting to connect to MSN Chat from a Linux environment. Another user, named zmic, started reverse engineering the MSN Chat Control to understand its workings. Through several attempts, zmic managed to authenticate successfully sometimes and eventually refined the method to work consistently (see [pyMSNChat](./pyMSNChat/)).
 
 ## Technical Details
 The primary vulnerability in GateKeeper versions 1 and 2 was the omission of the server hostname in the hash. This allowed for a replay attack, where users could:
